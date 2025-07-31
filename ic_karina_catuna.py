@@ -518,6 +518,9 @@ if uploaded_zip:
      edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPreencherVolume(volume)
      edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPopularArrays(edges_volume, filled_volume, raio_volume, cx_volume, cy_volume)
      imagem_mascara = funcCriarMascara(volume, filled_volume)
+     st.markdown(edges_volume)
+     st.markdown(filled_volume)
+     st.markdown(raio_volume)
 
      image = volume[idx]
 
