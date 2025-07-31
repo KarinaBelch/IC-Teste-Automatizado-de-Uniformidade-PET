@@ -1,0 +1,10 @@
+streamlit
+numpy
+pandas
+SimpleITK
+pydicom
+pynrrd
+matplotlib
+pillow
+scikit-image
+scipy
