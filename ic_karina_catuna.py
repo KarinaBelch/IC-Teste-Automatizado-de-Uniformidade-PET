@@ -12,7 +12,7 @@ Original file is located at
 # @title Importando Bibliotecas
 
 # Instalação de pacotes
-!pip install pynrrd SimpleITK pydicom
+#!pip install pynrrd SimpleITK pydicom
 
 # Manipulação de dados e arrays
 import numpy as np
@@ -46,9 +46,11 @@ from skimage.draw import disk
 # Processamento morfológico e preenchimento
 from scipy import ndimage
 
+import streamlit as st
+
 # @title Importando Google Drive
-from google.colab import drive
-drive.mount('/content/drive')
+#from google.colab import drive
+#drive.mount('/content/drive')
 
 # @title Obtendo arquivo DICOM
 
@@ -437,7 +439,7 @@ metodo_2.to_excel("resultados_circulos_metodo_2.xlsx", index=False)
 
 """# Streamlit"""
 
-!pip install -q streamlit
+#!pip install -q streamlit
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
