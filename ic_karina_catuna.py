@@ -61,24 +61,24 @@ uploaded_zip = st.file_uploader(label='Upload your DICOM file:', type="zip")
 
 dicom_files = []
 
-for root, dirs, files in os.walk(dicom_dir):
-    for file in files:
-        if file.endswith(".dcm"):
-            dicom_files.append(os.path.join(root, file))
+#for root, dirs, files in os.walk(dicom_dir):
+#    for file in files:
+#        if file.endswith(".dcm"):
+#            dicom_files.append(os.path.join(root, file))
 
 print("Arquivos DICOM encontrados:", len(dicom_files))
 
 # @title Ordenando as fatias
 
 # Ordenar por InstanceNumber (ordem axial)
-slices = [pydicom.dcmread(f) for f in dicom_files]
-slices = [s for s in slices if hasattr(s, 'InstanceNumber')]
-slices.sort(key=lambda s: s.InstanceNumber)
+#slices = [pydicom.dcmread(f) for f in dicom_files]
+#slices = [s for s in slices if hasattr(s, 'InstanceNumber')]
+#slices.sort(key=lambda s: s.InstanceNumber)
 
 # Converter para volume 3D
-volume = np.stack([s.pixel_array for s in slices])
+#volume = np.stack([s.pixel_array for s in slices])
 
-print("Volume 3D:", volume.shape)  # (profundidade, altura, largura)
+#print("Volume 3D:", volume.shape)  # (profundidade, altura, largura)
 
 # @title Plotando fatias
 '''
