@@ -473,43 +473,36 @@ st.sidebar.caption("Leitura de arquivos DICOM.")
 # 
 # # Upload do arquivo
 uploaded_zip = st.file_uploader(label='Upload your DICOM file:', type="zip")
-# 
-# if uploaded_zip:
-#     temp_dir = "temp_upload"
-# 
-#     # Limpar e criar diretório temporário
-#     if os.path.exists(temp_dir):
-#         shutil.rmtree(temp_dir)
-#     os.makedirs(temp_dir)
-# 
-#     # Salvar arquivo zip
-#     zip_path = os.path.join(temp_dir, "uploaded.zip")
-#     with open(zip_path, "wb") as f:
-#         f.write(uploaded_zip.getbuffer())
-# 
-#     # Extrair arquivos do zip
-#     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-#         zip_ref.extractall(temp_dir)
-# 
-#     # Listar arquivos .dcm
-#     dicom_files = []
-#     for root, dirs, files in os.walk(temp_dir):
-#         for file in files:
-#             if file.endswith(".dcm"):
-#                 dicom_files.append(os.path.join(root, file))
-# 
-#     st.write("Arquivos DICOM encontrados:", len(dicom_files))
-# 
-#     # Ler e ordenar as fatias
-#     slices = [pydicom.dcmread(f) for f in dicom_files if f.endswith(".dcm")]
-#     slices = [s for s in slices if hasattr(s, 'InstanceNumber')]
-#     slices.sort(key=lambda s: s.InstanceNumber)
-# 
-#     # Criar volume 3D
-#     volume = np.stack([s.pixel_array for s in slices])
-#     st.write("Volume 3D:", volume.shape)
-# 
-#     col1, col2 = st.columns(2)
+
+if uploaded_zip:
+     temp_dir = "temp_upload"
+ 
+     # Limpar e criar diretório temporário
+     if os.path.exists(temp_dir):
+         shutil.rmtree(temp_dir)
+     os.makedirs(temp_dir)
+ 
+     # Salvar arquivo zip
+     zip_path = os.path.join(temp_dir, "uploaded.zip")
+     with open(zip_path, "wb") as f:
+         f.write(uploaded_zip.getbuffer())
+ 
+     # Extrair arquivos do zip
+     with zipfile.ZipFile(zip_path, "r") as zip_ref:
+         zip_ref.extractall(temp_dir)
+ 
+     # Listar arquivos .dcm
+    # Listar arquivos .dcm
+    dicom_files = []
+
+    dicom_files = funcObterArquivoDicom(temp_dir)
+
+    st.write("Arquivos DICOM encontrados:", len(dicom_files))
+
+    # Ler e ordenar as fatias
+    slices, volume = funcOrdenarFatias(dicom_files)
+
+    col1, col2 = st.columns(2)
 # 
 #     with col1:
 #         idx = st.slider("Escolha a fatia:", 0, volume.shape[0] - 1, 0)
