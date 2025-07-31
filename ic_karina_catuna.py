@@ -409,7 +409,7 @@ mask_array = sitk.GetArrayFromImage(mascara)
 
 """# Streamlit"""
 
-!pip install -q streamlit
+#!pip install -q streamlit
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
