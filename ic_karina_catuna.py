@@ -511,6 +511,10 @@ if uploaded_zip:
          ax.axis("off")
          st.pyplot(fig)
 
+     # Visualização múltipla (fig2)
+     st.markdown("---")
+     st.subheader(f"Visualização detalhada da fatia {idx}")
+
      edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPreencherVolume(volume)
      edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPopularArrays(edges_volume, filled_volume, raio_volume, cx_volume, cy_volume)
      imagem_mascara = funcCriarMascara(volume, filled_volume)
@@ -520,8 +524,7 @@ if uploaded_zip:
      image_rgb = img_as_float(image)
      edges_rgb = img_as_float(edges_volume[idx])
      filled_rgb = img_as_float(filled_volume[idx])
-     
-
+    
      fig2, axs = plt.subplots(1, 4, figsize=(15, 10))
 
      axs[0].imshow(image_rgb, cmap='gray')
