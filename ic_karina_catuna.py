@@ -32,7 +32,7 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 
 # Widgets interativos
-from ipywidgets import interact, widgets
+#from ipywidgets import interact, widgets
 
 # Processamento de imagens
 from PIL import Image
