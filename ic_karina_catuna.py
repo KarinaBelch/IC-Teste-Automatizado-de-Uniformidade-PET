@@ -445,7 +445,6 @@ def analisa_uniformidade(i, imagem_completa, tamanho_bloco=3):
 # %%writefile app.py
 # 
 # import streamlit as st
-# import streamlit as st
 # import pandas as pd
 # import numpy as np
 # import chardet
@@ -457,7 +456,6 @@ def analisa_uniformidade(i, imagem_completa, tamanho_bloco=3):
 # from ipywidgets import interact
 # import ipywidgets as widgets
 # import zipfile
-# import os
 import shutil
 # 
 # from PIL import Image
