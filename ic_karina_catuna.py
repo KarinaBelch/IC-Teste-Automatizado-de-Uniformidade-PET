@@ -463,16 +463,16 @@ def analisa_uniformidade(i, imagem_completa, tamanho_bloco=3):
 # from PIL import Image
 # 
 # # Titulo da página
-# st.set_page_config(page_title='Projeto de Iniciação Científica', page_icon='🥼', layout='wide')
-# st.title('Automated Uniformity Testing PET Instrumentation')
-# st.info('Projeto de Iniciação Cientifica referente ao curso de Engenharia Biomédica da Universidade Federal do ABC.')
+st.set_page_config(page_title='Projeto de Iniciação Científica', page_icon='🥼', layout='wide')
+st.title('Automated Uniformity Testing PET Instrumentation')
+st.info('Projeto de Iniciação Cientifica referente ao curso de Engenharia Biomédica da Universidade Federal do ABC.')
 # 
-# # Menu Lateral
-# st.sidebar.header("Menu")
-# st.sidebar.caption("Leitura de arquivos DICOM.")
+# Menu Lateral
+st.sidebar.header("Menu")
+st.sidebar.caption("Leitura de arquivos DICOM.")
 # 
 # # Upload do arquivo
-# uploaded_zip = st.file_uploader(label='Upload your DICOM file:', type="zip")
+uploaded_zip = st.file_uploader(label='Upload your DICOM file:', type="zip")
 # 
 # if uploaded_zip:
 #     temp_dir = "temp_upload"
