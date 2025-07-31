@@ -522,7 +522,7 @@ if uploaded_zip:
      filled_rgb = img_as_float(filled_volume[idx])
      imagem_mascara
 
-     fig, axs = plt.subplots(1, 4, figsize=(15, 10))
+     fig2, axs = plt.subplots(1, 4, figsize=(15, 10))
 
      axs[0].imshow(image_rgb, cmap='gray')
      axs[0].set_title(f'Imagem Original (slice {idx})')
@@ -540,7 +540,7 @@ if uploaded_zip:
      axs[3].set_title('Imagem com a máscara aplicada')
      axs[3].axis('off')
 
-     plt.show()
+     st.pyplot(fig2)
 
 #!npm install localtunnel
 
