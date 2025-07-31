@@ -84,7 +84,7 @@ def funcOrdenarFatias(dicom_files):
 
   return slices, volume
 
-slices, volume = funcOrdenarFatias(dicom_files)
+#slices, volume = funcOrdenarFatias(dicom_files)
 
 # @title Plotando fatias
 
