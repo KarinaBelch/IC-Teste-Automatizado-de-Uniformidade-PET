@@ -160,7 +160,7 @@ def funcCriarMascara(volume, filled_volume):
   imagem_mascara = filled_volume*volume
   return imagem_mascara
 
-imagem_mascara = funcCriarMascara(volume, filled_volume)
+#imagem_mascara = funcCriarMascara(volume, filled_volume)
 
 # @title Plotando gráficos com as imagens
 
