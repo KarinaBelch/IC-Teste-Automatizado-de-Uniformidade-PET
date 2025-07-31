@@ -520,7 +520,7 @@ if uploaded_zip:
      image_rgb = img_as_float(image)
      edges_rgb = img_as_float(edges_volume[idx])
      filled_rgb = img_as_float(filled_volume[idx])
-     imagem_mascara
+     
 
      fig2, axs = plt.subplots(1, 4, figsize=(15, 10))
 
