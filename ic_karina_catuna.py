@@ -12,7 +12,7 @@ Original file is located at
 # @title Importando Bibliotecas
 
 # Instalação de pacotes
-install pynrrd SimpleITK pydicom
+# !pip install pynrrd SimpleITK pydicom
 
 # Manipulação de dados e arrays
 import numpy as np
