@@ -215,7 +215,7 @@ def recorta_por_circulo(image, cx, cy, raio):
 
     return recorte
 
- @title Chamando a função
+ #@title Chamando a função
 
 #imagem_cortada_volume = []
 
