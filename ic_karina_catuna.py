@@ -125,20 +125,20 @@ def funcMascaraCircularReduzida(image_rgb, scale):
 #cy_volume = np.zeros(len(dicom_files))
 
 # @title Populando os arrays
-for i in range(volume.shape[0]):
+#for i in range(volume.shape[0]):
 
-    image = volume[i]
-    image_rgb = img_as_float(image)
+#    image = volume[i]
+#    image_rgb = img_as_float(image)
 
-    edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.9)
-    edges_volume[i] = edges
-    filled_volume[i] = filled
-    raio_volume[i] = raio
-    cx_volume[i] = cx
-    cy_volume[i] = cy
+#    edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.9)
+#    edges_volume[i] = edges
+#    filled_volume[i] = filled
+#    raio_volume[i] = raio
+#    cx_volume[i] = cx
+#    cy_volume[i] = cy
 
 # @title Criando a máscara
-imagem_mascara = filled_volume*volume
+#imagem_mascara = filled_volume*volume
 
 # @title Plotando gráficos com as imagens
 '''
@@ -197,11 +197,11 @@ def recorta_por_circulo(image, cx, cy, raio):
 # @title Chamando a função
 
 imagem_cortada_volume = []
-
+'''
 for i in range(len(volume)):
     imagem_cortada = recorta_por_circulo(imagem_mascara[i], cx_volume[i], cy_volume[i], raio_volume[i])
     imagem_cortada_volume.append(imagem_cortada)
-
+'''
 # @title Plotando gráfico
 '''
 def show_slice(i):
