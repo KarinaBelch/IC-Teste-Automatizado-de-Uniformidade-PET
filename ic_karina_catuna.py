@@ -515,17 +515,17 @@ if uploaded_zip:
      edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPopularArrays(edges_volume, filled_volume, raio_volume, cx_volume, cy_volume)
      imagem_mascara = funcCriarMascara(volume, filled_volume)
 
-     image = volume[5]
+     image = volume[idx]
 
      image_rgb = img_as_float(image)
-     edges_rgb = img_as_float(edges_volume[i])
-     filled_rgb = img_as_float(filled_volume[i])
+     edges_rgb = img_as_float(edges_volume[idx])
+     filled_rgb = img_as_float(filled_volume[idx])
      imagem_mascara
 
      fig, axs = plt.subplots(1, 4, figsize=(15, 10))
 
      axs[0].imshow(image_rgb, cmap='gray')
-     axs[0].set_title(f'Imagem Original (slice {i})')
+     axs[0].set_title(f'Imagem Original (slice {idx})')
      axs[0].axis('off')
 
      axs[1].imshow(edges_rgb, cmap='gray')
@@ -536,7 +536,7 @@ if uploaded_zip:
      axs[2].set_title('Borda Reduzida e Preenchida (90%)')
      axs[2].axis('off')
 
-     axs[3].imshow(imagem_mascara[5], cmap='gray')
+     axs[3].imshow(imagem_mascara[idx], cmap='gray')
      axs[3].set_title('Imagem com a máscara aplicada')
      axs[3].axis('off')
 
