@@ -215,7 +215,7 @@ def recorta_por_circulo(image, cx, cy, raio):
 
     return recorte
 
-# @title Chamando a função
+ @title Chamando a função
 
 #imagem_cortada_volume = []
 
@@ -510,6 +510,37 @@ if uploaded_zip:
          ax.set_title(f"Slice {idx}")
          ax.axis("off")
          st.pyplot(fig)
+
+    edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPreencherVolume(volume)
+    edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPopularArrays(edges_volume, filled_volume, raio_volume, cx_volume, cy_volume)
+    imagem_mascara = funcCriarMascara(volume, filled_volume)
+
+    image = volume[5]
+
+    image_rgb = img_as_float(image)
+    edges_rgb = img_as_float(edges_volume[i])
+    filled_rgb = img_as_float(filled_volume[i])
+    imagem_mascara
+
+    fig, axs = plt.subplots(1, 4, figsize=(15, 10))
+
+    axs[0].imshow(image_rgb, cmap='gray')
+    axs[0].set_title(f'Imagem Original (slice {i})')
+    axs[0].axis('off')
+
+    axs[1].imshow(edges_rgb, cmap='gray')
+    axs[1].set_title('Borda')
+    axs[1].axis('off')
+
+    axs[2].imshow(filled_rgb, cmap='gray')
+    axs[2].set_title('Borda Reduzida e Preenchida (90%)')
+    axs[2].axis('off')
+
+    axs[3].imshow(imagem_mascara[i], cmap='gray')
+    axs[3].set_title('Imagem com a máscara aplicada')
+    axs[3].axis('off')
+
+    plt.show()
 
 #!npm install localtunnel
 
