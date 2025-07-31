@@ -216,14 +216,14 @@ def recorta_por_circulo(image, cx, cy, raio):
     return recorte
 
 # @title Chamando a função
-'''
-imagem_cortada_volume = []
 
-for i in range(len(volume)):
-    imagem_cortada = recorta_por_circulo(imagem_mascara[i], cx_volume[i], cy_volume[i], raio_volume[i])
-    imagem_cortada_volume.append(imagem_cortada)
+#imagem_cortada_volume = []
 
-'''
+#for i in range(len(volume)):
+#    imagem_cortada = recorta_por_circulo(imagem_mascara[i], cx_volume[i], cy_volume[i], raio_volume[i])
+#    imagem_cortada_volume.append(imagem_cortada)
+
+
 
 # @title Plotando gráfico
 
@@ -274,20 +274,20 @@ def func_Circulos(imagemCortada):
     return lista_circulos
 
 # @title Aplicando a mascára para cada círculos
-'''
-Im_circulos_volume = []
 
-for i in range(len(imagem_cortada_volume)):
-    circulos = func_Circulos(imagem_cortada_volume[i])  # 7 imagens
-    imagens_com_circulos = [c * imagem_cortada_volume[i] for c in circulos]
+#Im_circulos_volume = []
+
+#for i in range(len(imagem_cortada_volume)):
+#    circulos = func_Circulos(imagem_cortada_volume[i])  # 7 imagens
+#    imagens_com_circulos = [c * imagem_cortada_volume[i] for c in circulos]
 
     # Cria a máscara unida
-    mascara_unida = np.clip(np.sum(circulos, axis=0), 0, 1)
-    imagem_unida = mascara_unida * imagem_cortada_volume[i]
+#    mascara_unida = np.clip(np.sum(circulos, axis=0), 0, 1)
+#    imagem_unida = mascara_unida * imagem_cortada_volume[i]
 
-    imagens_com_circulos.append(imagem_unida)  # adiciona como oitava imagem
-    Im_circulos_volume.append(imagens_com_circulos)
-'''
+#    imagens_com_circulos.append(imagem_unida)  # adiciona como oitava imagem
+#   Im_circulos_volume.append(imagens_com_circulos)
+
 
 # @title Plotando as máscaras para cada círculo
 
