@@ -45,7 +45,7 @@ from skimage.draw import disk
 
 # Processamento morfológico e preenchimento
 from scipy import ndimage
-
+'''
 # @title Importando Google Drive
 from google.colab import drive
 drive.mount('/content/drive')
@@ -53,6 +53,7 @@ drive.mount('/content/drive')
 # @title Obtendo arquivo DICOM
 
 dicom_dir = "/content/drive/MyDrive/IC2024/Aquis1"
+'''
 dicom_files = []
 
 for root, dirs, files in os.walk(dicom_dir):
