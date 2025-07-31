@@ -385,7 +385,7 @@ def funcQuadrados(fatia):
   num_quadrados = int(tamanho_total/quadrante[0])
   num_quadrados
 
-teste = funcQuadrados(slices[0])
+#teste = funcQuadrados(slices[0])
 
 metodo_2 = []
 
@@ -423,9 +423,9 @@ def analisa_uniformidade(i, imagem_completa, tamanho_bloco=3):
     df = pd.DataFrame(resultados)
     return df
 
-metodo_2 = analisa_uniformidade(i, imagem_cortada_volume, tamanho_bloco=3)
+#metodo_2 = analisa_uniformidade(i, imagem_cortada_volume, tamanho_bloco=3)
 
-metodo_2.to_excel("resultados_circulos_metodo_2.xlsx", index=False)
+#metodo_2.to_excel("resultados_circulos_metodo_2.xlsx", index=False)
 
 #display(metodo_2)
 
