@@ -235,7 +235,7 @@ def show_slice(i):
 
 #interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))
 
-"""# Metodo 1 | Miller | 7 Circulos"""
+# Metodo 1 | Miller | 7 Circulos
 
 # @title Função para criar os 7 círculos
 def func_Circulos(imagemCortada):
@@ -349,12 +349,12 @@ dados = []
 
 #display(df)
 
-"""# Metodo 2
+# Metodo 2
 
 ## Para encontrar o tamanho do fisico do cilindro, obter um array com os valores da imagem (senograma)
-- Encontrar número de pixels e converter em milimetros utilizando o tamanho do pixel no dicom
-- Qualquer valor em dicom sempre será em mm
-"""
+#- Encontrar número de pixels e converter em milimetros utilizando o tamanho do pixel no dicom
+#- Qualquer valor em dicom sempre será em mm
+
 
 # Tamanho do cilindro
 
@@ -429,15 +429,15 @@ def analisa_uniformidade(i, imagem_completa, tamanho_bloco=3):
 
 #display(metodo_2)
 
-"""Ajustes:
+#Ajustes:
 ## Obter 8x8mm de ROI dos quadrantes do phanton
-"""
+#
 
 # mascara = sitk.BinaryThreshold(sitk.GetImageFromArray(volume), lowerThreshold=0, upperThreshold=0.1, insideValue=1, outsideValue=0)
 
 # mask_array = sitk.GetArrayFromImage(mascara)
 
-"""# Streamlit"""
+# Streamlit
 
 #!pip install -q streamlit
 
