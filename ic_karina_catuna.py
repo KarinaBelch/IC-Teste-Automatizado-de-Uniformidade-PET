@@ -133,7 +133,7 @@ def funcPreencherVolume(volume):
 
   return edges_volume, filled_volume, raio_volume, cx_volume, cy_volume
 
-edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPreencherVolume(volume)
+#edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPreencherVolume(volume)
 
 # @title Populando os arrays
 
