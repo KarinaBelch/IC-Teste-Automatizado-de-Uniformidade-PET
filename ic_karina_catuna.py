@@ -458,7 +458,7 @@ def analisa_uniformidade(i, imagem_completa, tamanho_bloco=3):
 # import ipywidgets as widgets
 # import zipfile
 # import os
-# import shutil
+import shutil
 # 
 # from PIL import Image
 # 
