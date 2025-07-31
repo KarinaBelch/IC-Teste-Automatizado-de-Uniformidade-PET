@@ -314,39 +314,39 @@ def show_slice(i):
 
 # @title Gerando arquivo excel
 dados = []
-'''
-for i, fatia in enumerate(Im_circulos_volume):  # i = índice da slice
-    for j in range(len(fatia)):  # j = índice do círculo (0 a 7, se você incluiu o unido)
-        imagem_mascarada = fatia[j]
 
-        # Pega apenas os valores dentro do círculo (ou seja, > 0)
-        valores = imagem_mascarada[imagem_mascarada > 0]
+# for i, fatia in enumerate(Im_circulos_volume):  # i = índice da slice
+#     for j in range(len(fatia)):  # j = índice do círculo (0 a 7, se você incluiu o unido)
+#         imagem_mascarada = fatia[j]
 
-        # Se não houver valores válidos (ex: tudo 0), use NaN
-        if len(valores) > 0:
-            mean = np.mean(valores)
-            min_val = min(valores)
-            max_val = max(valores)
-            std = np.std(valores)
-        else:
-            mean = min_val = max_val = std = np.nan
+#         # Pega apenas os valores dentro do círculo (ou seja, > 0)
+#         valores = imagem_mascarada[imagem_mascarada > 0]
 
-        dados.append({
-            "Name": f"S{i}C{j}",
-            "Slice": i,
-            "Circle": j + 1,  # 1 a 7 (ou 8 se unido)
-            "Mean": mean,
-            "Min": min_val,
-            "Max": max_val,
-            "Std": std
-        })
+#         # Se não houver valores válidos (ex: tudo 0), use NaN
+#         if len(valores) > 0:
+#             mean = np.mean(valores)
+#             min_val = min(valores)
+#             max_val = max(valores)
+#             std = np.std(valores)
+#         else:
+#             mean = min_val = max_val = std = np.nan
 
-df = pd.DataFrame(dados)
+#         dados.append({
+#             "Name": f"S{i}C{j}",
+#             "Slice": i,
+#             "Circle": j + 1,  # 1 a 7 (ou 8 se unido)
+#             "Mean": mean,
+#             "Min": min_val,
+#             "Max": max_val,
+#             "Std": std
+#         })
 
-# Salvar como CSV ou Excel
-#df.to_csv("resultados_circulos.csv", index=False)
-df.to_excel("resultados_circulos.xlsx", index=False)
-'''
+# df = pd.DataFrame(dados)
+
+# # Salvar como CSV ou Excel
+# #df.to_csv("resultados_circulos.csv", index=False)
+# df.to_excel("resultados_circulos.xlsx", index=False)
+
 #display(df)
 
 """# Metodo 2
@@ -357,18 +357,18 @@ df.to_excel("resultados_circulos.xlsx", index=False)
 """
 
 # Tamanho do cilindro
-'''
-tamanhoPixel = slices[0].PixelSpacing
-print(tamanhoPixel)
-alturaPixel = imagem_cortada_volume[0].shape[0]
-print(alturaPixel)
-alturaMM = alturaPixel * tamanhoPixel[0]
-print(alturaMM)
-larguraPixel = imagem_cortada_volume[0].shape[1]
-print(larguraPixel)
-larguraMM = larguraPixel * tamanhoPixel[1]
-print(larguraMM)
-'''
+
+# tamanhoPixel = slices[0].PixelSpacing
+# print(tamanhoPixel)
+# alturaPixel = imagem_cortada_volume[0].shape[0]
+# print(alturaPixel)
+# alturaMM = alturaPixel * tamanhoPixel[0]
+# print(alturaMM)
+# larguraPixel = imagem_cortada_volume[0].shape[1]
+# print(larguraPixel)
+# larguraMM = larguraPixel * tamanhoPixel[1]
+# print(larguraMM)
+
 
 # Obtendo o tamanho do pixel em mm
 
