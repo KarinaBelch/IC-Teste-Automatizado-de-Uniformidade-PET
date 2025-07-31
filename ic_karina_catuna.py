@@ -491,17 +491,17 @@ if uploaded_zip:
      with zipfile.ZipFile(zip_path, "r") as zip_ref:
          zip_ref.extractall(temp_dir)
 
-    # Listar arquivos .dcm
-    dicom_files = []
+     # Listar arquivos .dcm
+     dicom_files = []
     
-    dicom_files = funcObterArquivoDicom(temp_dir)
+     dicom_files = funcObterArquivoDicom(temp_dir)
     
-    st.write("Arquivos DICOM encontrados:", len(dicom_files))
+     st.write("Arquivos DICOM encontrados:", len(dicom_files))
     
-    # Ler e ordenar as fatias
-    slices, volume = funcOrdenarFatias(dicom_files)
+     # Ler e ordenar as fatias
+     slices, volume = funcOrdenarFatias(dicom_files)
     
-    col1, col2 = st.columns(2)
+     col1, col2 = st.columns(2)
 # 
 #     with col1:
 #         idx = st.slider("Escolha a fatia:", 0, volume.shape[0] - 1, 0)
