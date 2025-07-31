@@ -12,7 +12,7 @@ Original file is located at
 # @title Importando Bibliotecas
 
 # Instalação de pacotes
-# !pip install pynrrd SimpleITK pydicom
+!pip install pynrrd SimpleITK pydicom
 
 # Manipulação de dados e arrays
 import numpy as np
@@ -32,7 +32,7 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 
 # Widgets interativos
-#from ipywidgets import interact, widgets
+from ipywidgets import interact, widgets
 
 # Processamento de imagens
 from PIL import Image
@@ -46,42 +46,46 @@ from skimage.draw import disk
 # Processamento morfológico e preenchimento
 from scipy import ndimage
 
-import streamlit as st
-
 # @title Importando Google Drive
-#from google.colab import drive
-#drive.mount('/content/drive')
+from google.colab import drive
+drive.mount('/content/drive')
 
 # @title Obtendo arquivo DICOM
 
-#dicom_dir = "/content/drive/MyDrive/IC2024/Aquis1"
-
-# Upload do arquivo
-uploaded_zip = st.file_uploader(label='Upload your DICOM file:', type="zip")
-
+dicom_dir = "/content/drive/MyDrive/IC2024/Aquis1"
 dicom_files = []
 
-#for root, dirs, files in os.walk(dicom_dir):
-#    for file in files:
-#        if file.endswith(".dcm"):
-#            dicom_files.append(os.path.join(root, file))
+def funcObterArquivoDicom(dicom_dir):
+  for root, dirs, files in os.walk(dicom_dir):
+      for file in files:
+          if file.endswith(".dcm"):
+              dicom_files.append(os.path.join(root, file))
 
-print("Arquivos DICOM encontrados:", len(dicom_files))
+  print("Arquivos DICOM encontrados:", len(dicom_files))
+
+  return dicom_files
+
+dicom_files = funcObterArquivoDicom(dicom_dir)
 
 # @title Ordenando as fatias
 
-# Ordenar por InstanceNumber (ordem axial)
-#slices = [pydicom.dcmread(f) for f in dicom_files]
-#slices = [s for s in slices if hasattr(s, 'InstanceNumber')]
-#slices.sort(key=lambda s: s.InstanceNumber)
+def funcOrdenarFatias(dicom_files):
+  # Ordenar por InstanceNumber (ordem axial)
+  slices = [pydicom.dcmread(f) for f in dicom_files]
+  slices = [s for s in slices if hasattr(s, 'InstanceNumber')]
+  slices.sort(key=lambda s: s.InstanceNumber)
 
-# Converter para volume 3D
-#volume = np.stack([s.pixel_array for s in slices])
+  # Converter para volume 3D
+  volume = np.stack([s.pixel_array for s in slices])
 
-#print("Volume 3D:", volume.shape)  # (profundidade, altura, largura)
+  print("Volume 3D:", volume.shape)  # (profundidade, altura, largura)
+
+  return slices, volume
+
+slices, volume = funcOrdenarFatias(dicom_files)
 
 # @title Plotando fatias
-'''
+
 def show_slice(i):
     plt.figure(figsize=(5,5))
     plt.imshow(volume[i], cmap='gray')
@@ -89,7 +93,7 @@ def show_slice(i):
     plt.axis("off")
     plt.show()
 
-interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))'''
+# interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))
 
 # @title Função para Criar a Máscara
 def funcMascaraCircularReduzida(image_rgb, scale):
@@ -118,30 +122,46 @@ def funcMascaraCircularReduzida(image_rgb, scale):
 # @title Declarando os arrays
 # Prepara array para armazenar volume preenchido
 
-#edges_volume = np.zeros_like(volume, dtype=np.uint8)
-#filled_volume = np.zeros_like(volume, dtype=np.uint8)
-#raio_volume = np.zeros(len(dicom_files))
-#cx_volume = np.zeros(len(dicom_files))
-#cy_volume = np.zeros(len(dicom_files))
+def funcPreencherVolume(volume):
+  edges_volume = np.zeros_like(volume, dtype=np.uint8)
+  filled_volume = np.zeros_like(volume, dtype=np.uint8)
+  raio_volume = np.zeros(len(dicom_files))
+  cx_volume = np.zeros(len(dicom_files))
+  cy_volume = np.zeros(len(dicom_files))
+
+  return edges_volume, filled_volume, raio_volume, cx_volume, cy_volume
+
+edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPreencherVolume(volume)
 
 # @title Populando os arrays
-#for i in range(volume.shape[0]):
 
-#    image = volume[i]
-#    image_rgb = img_as_float(image)
+def funcPopularArrays(edges_volume, filled_volume, raio_volume, cx_volume, cy_volume):
+  for i in range(volume.shape[0]):
 
-#    edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.9)
-#    edges_volume[i] = edges
-#    filled_volume[i] = filled
-#    raio_volume[i] = raio
-#    cx_volume[i] = cx
-#    cy_volume[i] = cy
+      image = volume[i]
+      image_rgb = img_as_float(image)
+
+      edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.9)
+      edges_volume[i] = edges
+      filled_volume[i] = filled
+      raio_volume[i] = raio
+      cx_volume[i] = cx
+      cy_volume[i] = cy
+
+  return edges_volume, filled_volume, raio_volume, cx_volume, cy_volume
+
+  edges_volume, filled_volume, raio_volume, cx_volume, cy_volume = funcPopularArrays(edges_volume, filled_volume, raio_volume, cx_volume, cy_volume)
 
 # @title Criando a máscara
-#imagem_mascara = filled_volume*volume
+
+def funcCriarMascara(volume, filled_volume):
+  imagem_mascara = filled_volume*volume
+  return imagem_mascara
+
+imagem_mascara = funcCriarMascara(volume, filled_volume)
 
 # @title Plotando gráficos com as imagens
-'''
+
 def show_slice(i):
     image = volume[i]
 
@@ -170,8 +190,7 @@ def show_slice(i):
 
     plt.show()
 
-interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))
-'''
+#interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))
 
 # @title Função para retirar espaços em branco da imagem
 def recorta_por_circulo(image, cx, cy, raio):
@@ -195,23 +214,24 @@ def recorta_por_circulo(image, cx, cy, raio):
     return recorte
 
 # @title Chamando a função
-
-imagem_cortada_volume = []
 '''
+imagem_cortada_volume = []
+
 for i in range(len(volume)):
     imagem_cortada = recorta_por_circulo(imagem_mascara[i], cx_volume[i], cy_volume[i], raio_volume[i])
     imagem_cortada_volume.append(imagem_cortada)
+
 '''
+
 # @title Plotando gráfico
-'''
+
 def show_slice(i):
     plt.figure(figsize=(5,5))
     plt.imshow(imagem_cortada_volume[i], cmap='gray')
     plt.title(f"Slice {i}")
     plt.show()
 
-interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))
-'''
+#interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))
 
 """# Metodo 1 | Miller | 7 Circulos"""
 
@@ -252,6 +272,7 @@ def func_Circulos(imagemCortada):
     return lista_circulos
 
 # @title Aplicando a mascára para cada círculos
+'''
 Im_circulos_volume = []
 
 for i in range(len(imagem_cortada_volume)):
@@ -264,9 +285,10 @@ for i in range(len(imagem_cortada_volume)):
 
     imagens_com_circulos.append(imagem_unida)  # adiciona como oitava imagem
     Im_circulos_volume.append(imagens_com_circulos)
+'''
 
 # @title Plotando as máscaras para cada círculo
-'''
+
 def show_slice(i):
     fig, axs = plt.subplots(1, 9, figsize=(20, 4))
 
@@ -286,13 +308,11 @@ def show_slice(i):
     plt.tight_layout()
     plt.show()
 
-
-interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))
-'''
+# interact(show_slice, i=widgets.IntSlider(min=0, max=volume.shape[0]-1, step=1, value=0))
 
 # @title Gerando arquivo excel
 dados = []
-
+'''
 for i, fatia in enumerate(Im_circulos_volume):  # i = índice da slice
     for j in range(len(fatia)):  # j = índice do círculo (0 a 7, se você incluiu o unido)
         imagem_mascarada = fatia[j]
@@ -324,7 +344,7 @@ df = pd.DataFrame(dados)
 # Salvar como CSV ou Excel
 #df.to_csv("resultados_circulos.csv", index=False)
 df.to_excel("resultados_circulos.xlsx", index=False)
-
+'''
 #display(df)
 
 """# Metodo 2
@@ -335,6 +355,7 @@ df.to_excel("resultados_circulos.xlsx", index=False)
 """
 
 # Tamanho do cilindro
+'''
 tamanhoPixel = slices[0].PixelSpacing
 print(tamanhoPixel)
 alturaPixel = imagem_cortada_volume[0].shape[0]
@@ -345,6 +366,7 @@ larguraPixel = imagem_cortada_volume[0].shape[1]
 print(larguraPixel)
 larguraMM = larguraPixel * tamanhoPixel[1]
 print(larguraMM)
+'''
 
 # Obtendo o tamanho do pixel em mm
 
@@ -409,13 +431,13 @@ metodo_2.to_excel("resultados_circulos_metodo_2.xlsx", index=False)
 ## Obter 8x8mm de ROI dos quadrantes do phanton
 """
 
-mascara = sitk.BinaryThreshold(sitk.GetImageFromArray(volume), lowerThreshold=0, upperThreshold=0.1, insideValue=1, outsideValue=0)
+# mascara = sitk.BinaryThreshold(sitk.GetImageFromArray(volume), lowerThreshold=0, upperThreshold=0.1, insideValue=1, outsideValue=0)
 
-mask_array = sitk.GetArrayFromImage(mascara)
+# mask_array = sitk.GetArrayFromImage(mascara)
 
 """# Streamlit"""
 
-#!pip install -q streamlit
+!pip install -q streamlit
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
