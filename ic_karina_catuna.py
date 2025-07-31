@@ -500,16 +500,16 @@ if uploaded_zip:
      slices, volume = funcOrdenarFatias(dicom_files)
     
      col1, col2 = st.columns(2)
-# 
-#     with col1:
-#         idx = st.slider("Escolha a fatia:", 0, volume.shape[0] - 1, 0)
-# 
-#     with col2:
-#         fig, ax = plt.subplots(figsize=(6, 6))
-#         ax.imshow(volume[idx], cmap="gray")
-#         ax.set_title(f"Slice {idx}")
-#         ax.axis("off")
-#         st.pyplot(fig)
+
+     with col1:
+         idx = st.slider("Escolha a fatia:", 0, volume.shape[0] - 1, 0)
+ 
+     with col2:
+         fig, ax = plt.subplots(figsize=(6, 6))
+         ax.imshow(volume[idx], cmap="gray")
+         ax.set_title(f"Slice {idx}")
+         ax.axis("off")
+         st.pyplot(fig)
 
 #!npm install localtunnel
 
