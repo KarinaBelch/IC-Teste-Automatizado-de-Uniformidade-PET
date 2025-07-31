@@ -118,11 +118,11 @@ def funcMascaraCircularReduzida(image_rgb, scale):
 # @title Declarando os arrays
 # Prepara array para armazenar volume preenchido
 
-edges_volume = np.zeros_like(volume, dtype=np.uint8)
-filled_volume = np.zeros_like(volume, dtype=np.uint8)
-raio_volume = np.zeros(len(dicom_files))
-cx_volume = np.zeros(len(dicom_files))
-cy_volume = np.zeros(len(dicom_files))
+#edges_volume = np.zeros_like(volume, dtype=np.uint8)
+#filled_volume = np.zeros_like(volume, dtype=np.uint8)
+#raio_volume = np.zeros(len(dicom_files))
+#cx_volume = np.zeros(len(dicom_files))
+#cy_volume = np.zeros(len(dicom_files))
 
 # @title Populando os arrays
 for i in range(volume.shape[0]):
