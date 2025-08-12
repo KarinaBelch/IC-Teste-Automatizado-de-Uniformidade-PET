@@ -143,13 +143,16 @@ if uploaded_zip:
         if not df.empty:
             st.dataframe(df)
 
-            buffer = io.BytesIO()
-            with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-                df.to_excel(writer, index=False, sheet_name="Resultados")
+        # Criar o Excel em memória
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+            df.to_excel(writer, index=False, sheet_name="Dados")
 
-            st.download_button(
-                label="Baixar Excel",
-                data=buffer.getvalue(),
-                file_name="resultados_circulos.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+        # Botão para baixar o Excel
+        st.download_button(
+            label="Download Excel",
+            data=buffer.getvalue(),
+            file_name="dados.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            icon=":material/download:",
+        )
