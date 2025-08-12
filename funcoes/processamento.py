@@ -1,11 +1,7 @@
 # Manipulação de arquivos e compressão
 import os
-import zipfile
-from io import BytesIO
 
 # Leitura e manipulação de arquivos médicos
-# import nrrd
-import SimpleITK as sitk
 import pydicom
 
 # Manipulação de dados e arrays
@@ -13,12 +9,9 @@ import numpy as np
 import pandas as pd
 
 # Processamento de imagens
-from PIL import Image
-from skimage import color, img_as_ubyte, img_as_float
+from skimage import img_as_ubyte, img_as_float
 from skimage.feature import canny
-from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
-from skimage.draw import circle_perimeter, ellipse_perimeter
-from skimage.draw import polygon
+from skimage.transform import hough_circle, hough_circle_peaks
 from skimage.draw import disk
 
 # Função para obter os arquivos DICOM em um array
@@ -33,6 +26,7 @@ def funcObterArquivoDicom(dicom_dir):
 
   return dicom_files
 
+
 # Função para ordenar os slices do arquivo DICOM
 def funcOrdenarFatias(dicom_files):
   # Ordenar por InstanceNumber (ordem axial)
@@ -43,9 +37,8 @@ def funcOrdenarFatias(dicom_files):
   # Converter para volume 3D
   volume = np.stack([s.pixel_array for s in slices])
 
-  print("Volume 3D:", volume.shape)  # (profundidade, altura, largura)
-
   return slices, volume
+
 
 def funcFatiaversusContagem(volume, limiar):
   fatia_contagem = np.count_nonzero(volume, axis=(1,2))
@@ -54,7 +47,7 @@ def funcFatiaversusContagem(volume, limiar):
 
   return fatia_contagem, volume_filtrado
 
-# @title Função para Criar a Máscara
+# Função para Criar a Máscara Reduzida
 def funcMascaraCircularReduzida(image_rgb, scale):
 
     edges = canny(image_rgb, sigma=5, low_threshold=0.1, high_threshold=0.2)
@@ -80,38 +73,44 @@ def funcMascaraCircularReduzida(image_rgb, scale):
 
 # Prepara array para armazenar volume preenchido
 
-def funcPreencherVolume(volume, dicom_files):
-  edges_volume = np.zeros_like(volume, dtype=np.uint8)
-  filled_volume = np.zeros_like(volume, dtype=np.uint8)
-  raio_volume = np.zeros(len(dicom_files))
-  cx_volume = np.zeros(len(dicom_files))
-  cy_volume = np.zeros(len(dicom_files))
+def funcPreencherVolume(volume):
+    shape_volume = volume.shape
+    num_slices = shape_volume[0]
 
-  return edges_volume, filled_volume, raio_volume, cx_volume, cy_volume
+    dados_volume = {
+        'edges': np.zeros(shape_volume, dtype=np.uint8),
+        'preenchido': np.zeros(shape_volume, dtype=np.uint8),
+        'raio': np.zeros(num_slices),
+        'cx': np.zeros(num_slices),
+        'cy': np.zeros(num_slices)
+    }
 
-def funcPopularArrays(volume, edges_volume, filled_volume, raio_volume, cx_volume, cy_volume):
-  for i in range(volume.shape[0]):
+    return dados_volume
 
-      image = volume[i]
-      image_rgb = img_as_float(image)
 
-      edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.9)
-      edges_volume[i] = edges
-      filled_volume[i] = filled
-      raio_volume[i] = raio
-      cx_volume[i] = cx
-      cy_volume[i] = cy
+def funcPopularArrays(volume_filtrado, dados_volume):
+    for i in range(volume_filtrado.shape[0]):
+        image = volume_filtrado[i]
+        image_rgb = img_as_float(image)
 
-  return edges_volume, filled_volume, raio_volume, cx_volume, cy_volume
+        edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.9)
 
-# @title Criando a máscara
+        dados_volume['edges'][i] = edges
+        dados_volume['preenchido'][i] = filled
+        dados_volume['raio'][i] = raio
+        dados_volume['cx'][i] = cx
+        dados_volume['cy'][i] = cy
+
+    return dados_volume
+
+# Criando a máscara
 def funcCriarMascara(volume, filled_volume):
   imagem_mascara = filled_volume*volume
   return imagem_mascara
 
 
 # Função para remover espaçoes vazios da imagem
-def recorta_por_circulo(image, cx, cy, raio):
+def funcRecortaPorCirculo(image, cx, cy, raio):
     h, w = image.shape[:2]
 
     if (h == 0 or w == 0):
@@ -130,3 +129,71 @@ def recorta_por_circulo(image, cx, cy, raio):
     recorte = image[y_min:y_max, x_min:x_max]
 
     return recorte
+
+
+def funcCirculos(imagemCortada):
+    diametro = imagemCortada.shape[0]
+    nx = ny = diametro
+
+    # Centros e distâncias
+    cx = (nx // 2) + 1
+    cy = (ny // 2) + 1
+    dx = (nx // 3) + 1
+    dy = (ny // 3) + 1
+
+    # Raios
+    rx = dx / 2
+    ry = dy / 2
+
+    x, y = np.meshgrid(np.arange(1, nx+1), np.arange(1, ny+1))
+
+    lista_circulos = []
+
+    for i in [-1, 0, 1]:
+        Im = np.zeros((nx, ny))
+        Im[((x - cx + i * 2 * rx) ** 2 + (y - cy) ** 2) < rx ** 2] = 1
+        lista_circulos.append(Im)
+
+    for i in [-1, 1]:
+        Im = np.zeros((nx, ny))
+        Im[((x - cx + i * rx) ** 2 + (y - cy + np.sqrt(3) * rx) ** 2) < rx ** 2] = 1
+        lista_circulos.append(Im)
+
+    for i in [-1, 1]:
+        Im = np.zeros((nx, ny))
+        Im[((x - cx + i * rx) ** 2 + (y - cy - np.sqrt(3) * rx) ** 2) < rx ** 2] = 1
+        lista_circulos.append(Im)
+
+    return lista_circulos
+
+
+def funcGerarDataframeMetodoUm(circulos_volume):
+   dados = []
+   for i, fatia in enumerate(circulos_volume):  # i = índice da slice
+    for j in range(len(fatia)-1):  # j = índice do círculo
+        imagem_mascarada = fatia[j]
+
+        # Pega apenas os valores dentro do círculo (ou seja, > 0)
+        valores = imagem_mascarada[imagem_mascarada > 0]
+
+        if len(valores) > 0:
+            mean = np.mean(valores)
+            min_val = min(valores)
+            max_val = max(valores)
+            std = np.std(valores)
+        else:
+            mean = min_val = max_val = std = np.nan
+
+        dados.append({
+            "Name": f"S{i}C{j}",
+            "Slice": i,
+            "Circle": j + 1,
+            "Mean": mean,
+            "Min": min_val,
+            "Max": max_val,
+            "Std": std
+        })
+
+   df = pd.DataFrame(dados)
+
+   return df
