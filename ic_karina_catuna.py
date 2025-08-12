@@ -9,7 +9,8 @@ import pandas as pd
 # Manipulação de arquivos e compressão
 import os
 import zipfile
-import io
+from io import BytesIO 
+from xlsxwriter import Workbook
 
 # Visualização
 import matplotlib.pyplot as plt
@@ -143,16 +144,15 @@ if uploaded_zip:
         if not df.empty:
             st.dataframe(df)
 
-        # Criar o Excel em memória
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
-            df.to_excel(writer, index=False, sheet_name="Dados")
+            # Criar o Excel em memória
+            buffer = BytesIO()
+            with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+                # Write each dataframe to a different worksheet.
+                df.to_excel(writer, sheet_name='Sheet1', index=False)
 
-        # Botão para baixar o Excel
-        st.download_button(
-            label="Download Excel",
-            data=buffer.getvalue(),
-            file_name="dados.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            icon=":material/download:",
-        )
+                download2 = st.download_button(
+                    label="Download data as Excel",
+                    data=buffer,
+                    file_name='large_df.xlsx',
+                    mime='application/vnd.ms-excel'
+                )

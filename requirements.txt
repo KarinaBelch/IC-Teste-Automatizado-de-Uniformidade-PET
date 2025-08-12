@@ -7,6 +7,5 @@ pynrrd
 matplotlib
 pillow
 scikit-image
-scipy
-openpyxl
 xlsxwriter
+scipy
