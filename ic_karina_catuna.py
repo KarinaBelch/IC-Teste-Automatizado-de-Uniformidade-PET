@@ -98,7 +98,7 @@ if uploaded_zip:
         
         fatia_contagem, volume_filtrado = funcao.funcFatiaversusContagem(volume, limiar)
 
-        fig, ax = plt.subplots(figsize=(10, 5))
+        fig, ax = plt.subplots(figsize=(10, 4))
         ax.plot(fatia_contagem, label='Original', marker='o')
         ax.axhline(limiar, color='red', linestyle='--', label=f'Limiar = {limiar}')
         ax.set_xlabel('Fatia')
