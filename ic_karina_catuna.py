@@ -19,6 +19,7 @@ import streamlit as st
 
 import shutil
 
+
 # Parâmetros
 dicom_files = []
 imagem_cortada_volume = []
@@ -143,7 +144,7 @@ if uploaded_zip:
             st.dataframe(df)
 
             buffer = io.BytesIO()
-            with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+            with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
                 df.to_excel(writer, index=False, sheet_name="Resultados")
 
             st.download_button(
