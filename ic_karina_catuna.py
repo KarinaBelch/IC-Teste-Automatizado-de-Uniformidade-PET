@@ -21,11 +21,12 @@ import streamlit as st
 import shutil
 
 
-# Parâmetros
+# Declarando arrays
 dicom_files = []
 imagem_cortada_volume = []
 circulos_volume = []
 dados = []
+metodo_hasford = []
 
 # Streamlit
 
@@ -108,52 +109,74 @@ if uploaded_zip:
         ax.grid(True)
 
         st.pyplot(fig)
+        
 
      if button:
-        # Visualização múltipla (fig2)
-        st.markdown("---")
-        st.subheader(f"Visualização detalhada")
 
-        # Obtendo ROI e aplicando a máscara
-        fatia_contagem, volume_filtrado = funcao.funcFatiaversusContagem(volume, limiar)
-
-        dados_volume = funcao.funcPreencherVolume(volume_filtrado)
-        dados_volume = funcao.funcPopularArrays(volume_filtrado, dados_volume)
-        imagem_mascara = funcao.funcCriarMascara(volume_filtrado, dados_volume['preenchido'])
+        with st.spinner("Relatório sendo gerado...", show_time=True):
+            # Divir o app em duas colunas
+            col1, col2 = st.columns([1,1])
 
 
-        for i in range(len(volume_filtrado)):
-            imagem_cortada = funcao.funcRecortaPorCirculo(imagem_mascara[i], dados_volume['cx'][i], dados_volume['cy'][i], dados_volume['raio'][i])
-            imagem_cortada_volume.append(imagem_cortada)
+            # Obtendo ROI e aplicando a máscara
+            fatia_contagem, volume_filtrado = funcao.funcFatiaversusContagem(volume, limiar)
+
+            dados_volume = funcao.funcPreencherVolume(volume_filtrado)
+            dados_volume = funcao.funcPopularArrays(volume_filtrado, dados_volume)
+            imagem_mascara = funcao.funcCriarMascara(volume_filtrado, dados_volume['preenchido'])
 
 
-        # Obtendo dados pelo método 1
-        for i in range(len(imagem_cortada_volume)):
-            circulos = funcao.funcCirculos(imagem_cortada_volume[i])  # 7 imagens
-            imagens_com_circulos = [c * imagem_cortada_volume[i] for c in circulos]
+            for i in range(len(volume_filtrado)):
+                imagem_cortada = funcao.funcRecortaPorCirculo(imagem_mascara[i], dados_volume['cx'][i], dados_volume['cy'][i], dados_volume['raio'][i])
+                imagem_cortada_volume.append(imagem_cortada)
 
-            # Cria a máscara unida
-            mascara_unida = np.clip(np.sum(circulos, axis=0), 0, 1)
-            imagem_unida = mascara_unida * imagem_cortada_volume[i]
+            with col1:
 
-            imagens_com_circulos.append(imagem_unida)  # adiciona como oitava imagem
-            circulos_volume.append(imagens_com_circulos)
-        
-        df = funcao.funcGerarDataframeMetodoUm(circulos_volume)
-
-        if not df.empty:
-            st.dataframe(df)
-
-            buffer = BytesIO()
-            with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                df.to_excel(writer, sheet_name='Sheet1', index=False)
+                st.markdown("---")
+                st.subheader(f"Abordagem de Miller")
 
 
-            buffer.seek(0)  # volta para o início do arquivo
+                # Obtendo dados pelo método 1
+                for i in range(len(imagem_cortada_volume)):
+                    circulos = funcao.funcCirculos(imagem_cortada_volume[i])  # 7 imagens
+                    imagens_com_circulos = [c * imagem_cortada_volume[i] for c in circulos]
 
-            st.download_button(
-                label="Download do Excel",
-                data=buffer.read(),
-                file_name='large_df.xlsx',
-                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
+                    # Cria a máscara unida
+                    mascara_unida = np.clip(np.sum(circulos, axis=0), 0, 1)
+                    imagem_unida = mascara_unida * imagem_cortada_volume[i]
+
+                    imagens_com_circulos.append(imagem_unida)  # adiciona como oitava imagem
+                    circulos_volume.append(imagens_com_circulos)
+                
+                df = funcao.funcGerarDataframeMetodoUm(circulos_volume)
+
+                if not df.empty:
+                    st.dataframe(df)
+
+                    #buffer = BytesIO()
+                    #with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+                    #    df.to_excel(writer, sheet_name='Sheet1', index=False)
+
+
+                    #buffer.seek(0)  # volta para o início do arquivo
+
+                    #st.download_button(
+                    #    label="Download do Excel",
+                    #    data=buffer.read(),
+                    #    file_name='large_df.xlsx',
+                    #    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    #)
+
+            with col2:
+                st.markdown("---")
+                st.subheader(f"Abordagem de Hasford")
+
+                tamanho_quadrados = funcao.funcQuadrados(slices[0], roi_mm = 12)
+
+                metodo_hasford = funcao.funcAnalisaUniformidade(i, imagem_cortada_volume, int(tamanho_quadrados))
+
+                if not metodo_hasford.empty:
+                    st.dataframe(metodo_hasford)
+
+
+
