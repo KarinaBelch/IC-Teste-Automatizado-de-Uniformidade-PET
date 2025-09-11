@@ -197,3 +197,52 @@ def funcGerarDataframeMetodoUm(circulos_volume):
    df = pd.DataFrame(dados)
 
    return df
+
+
+def funcQuadrados(fatia, roi_mm):
+  y_px_mm, x_px_mm = fatia.PixelSpacing
+
+  y_px = x_px = roi_mm / y_px_mm
+
+  tamanho_total = len(fatia)
+
+  quadrante = np.array([y_px, x_px])
+
+  num_quadrados = int(tamanho_total/quadrante[0])
+  
+  return quadrante[0]
+
+
+def funcAnalisaUniformidade(i, imagem_completa, tamanho_bloco):
+    resultados = []
+
+    for i in range(len(imagem_completa)):
+      imagem = imagem_completa[i]
+      h, w = imagem.shape
+
+      for y in range(0, h, tamanho_bloco):
+          for x in range(0, w, tamanho_bloco):
+              bloco = imagem[y:y+tamanho_bloco, x:x+tamanho_bloco]
+
+              # Pula blocos com todos os valores 0 (fora da área útil)
+              if np.all(bloco == 0):
+                  continue
+
+              # Considera apenas os valores maiores que zero
+              pixels_validos = bloco[bloco > 0]
+
+              if pixels_validos.size == 0:
+                  continue
+
+              resultados.append({
+                  "slice": i,
+                  "x": x,
+                  "y": y,
+                  "mean": np.mean(pixels_validos),
+                  "min": np.min(pixels_validos),
+                  "max": np.max(pixels_validos),
+                  "std": np.std(pixels_validos)
+              })
+
+    df = pd.DataFrame(resultados)
+    return df
