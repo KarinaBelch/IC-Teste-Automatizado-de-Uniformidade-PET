@@ -14,6 +14,7 @@ from skimage.feature import canny
 from skimage.transform import hough_circle, hough_circle_peaks
 from skimage.draw import disk
 
+
 # Função para obter os arquivos DICOM em um array
 def funcObterArquivoDicom(dicom_dir):
   dicom_files = []
@@ -93,7 +94,7 @@ def funcPopularArrays(volume_filtrado, dados_volume):
         image = volume_filtrado[i]
         image_rgb = img_as_float(image)
 
-        edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.9)
+        edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.88)
 
         dados_volume['edges'][i] = edges
         dados_volume['preenchido'][i] = filled
@@ -222,10 +223,14 @@ def funcAnalisaUniformidade(i, imagem_completa, tamanho_bloco):
 
       for y in range(0, h, tamanho_bloco):
           for x in range(0, w, tamanho_bloco):
+                 
+              if x + tamanho_bloco > w or y + tamanho_bloco > h:
+                continue
+
               bloco = imagem[y:y+tamanho_bloco, x:x+tamanho_bloco]
 
               # Pula blocos com todos os valores 0 (fora da área útil)
-              if np.all(bloco == 0):
+              if np.any(bloco == 0):
                   continue
 
               # Considera apenas os valores maiores que zero

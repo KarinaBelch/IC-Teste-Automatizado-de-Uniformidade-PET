@@ -1,19 +1,18 @@
 # @title Importando Bibliotecas
 
+# Arquivo criado para manter as funções
 import funcoes.processamento as funcao
 
 # Manipulação de dados e arrays
 import numpy as np
-import pandas as pd
 
 # Manipulação de arquivos e compressão
 import os
 import zipfile
-from io import BytesIO 
-from xlsxwriter import Workbook
 
 # Visualização
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 # Acesso a plataforma para deploy do código
 import streamlit as st
@@ -27,6 +26,10 @@ imagem_cortada_volume = []
 circulos_volume = []
 dados = []
 metodo_hasford = []
+
+# Chave para manter o slider visivel
+if "mostrar_slider" not in st.session_state:
+    st.session_state.mostrar_slider = False
 
 # Streamlit
 
@@ -94,6 +97,7 @@ if uploaded_zip:
 
         if st.button("Gerar relatório excel"):
             button = True
+            st.session_state.mostrar_slider = True
         else:
             button = False
         
@@ -153,19 +157,6 @@ if uploaded_zip:
                 if not df.empty:
                     st.dataframe(df)
 
-                    #buffer = BytesIO()
-                    #with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                    #    df.to_excel(writer, sheet_name='Sheet1', index=False)
-
-
-                    #buffer.seek(0)  # volta para o início do arquivo
-
-                    #st.download_button(
-                    #    label="Download do Excel",
-                    #    data=buffer.read(),
-                    #    file_name='large_df.xlsx',
-                    #    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    #)
 
             with col2:
                 st.markdown("---")
@@ -179,4 +170,55 @@ if uploaded_zip:
                     st.dataframe(metodo_hasford)
 
 
+     if st.session_state.mostrar_slider:
+
+        st.markdown("---")
+        st.subheader(f"Visão detalhada")
+
+        with st.expander("Abordagem de Miller"):    
+        
+            for i in range (len(imagem_cortada_volume)):
+                fig, axs = plt.subplots(1, 9, figsize=(20, 6))
+                axs[0].imshow(imagem_cortada_volume[i], cmap='gray')
+                axs[0].set_title(f'Slice Original\n(slice {i})')
+                axs[0].axis('off')
+
+                for j in range(7):
+                    axs[j+1].imshow(circulos_volume[i][j], cmap='gray')
+                    axs[j+1].set_title(f'Círculo {j+1}')
+                    axs[j+1].axis('off')
+
+                axs[8].imshow(circulos_volume[i][7], cmap='gray')
+                axs[8].set_title("Todos unidos")
+                axs[8].axis('off')
+                st.pyplot(fig)
+
+        with st.expander("Abordagem de Hasford"):
+            s = 0
+            for i in range (len(imagem_cortada_volume)//4):
+
+                fig, ax = plt.subplots(1, 4, figsize=(6, 6))
+
+                for j in range(4):
+                    ax[j].imshow(imagem_cortada_volume[s], cmap='gray')
+
+                    metodo_hasford_slice = metodo_hasford[metodo_hasford["slice"] == s]
+                    
+                    for _, row in metodo_hasford_slice.iterrows():
+                        x0, y0 = row["x"], row["y"]
+                        rect = patches.Rectangle(
+                            (x0-0.5, y0-0.5),         # canto inferior esquerdo
+                            tamanho_quadrados,        # largura
+                            tamanho_quadrados,        # altura
+                            linewidth=0.3,
+                            edgecolor="blue",
+                            facecolor="none"
+                        )
+                        ax[j].add_patch(rect) 
+                    
+                    ax[j].set_title(f'Slice {s}')
+                    ax[j].axis('off')
+                    s = s+1
+
+                st.pyplot(fig)
 
