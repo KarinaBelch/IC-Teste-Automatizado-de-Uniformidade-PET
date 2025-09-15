@@ -1,35 +1,28 @@
-# Manipulação de arquivos e compressão
-import os
-
-# Leitura e manipulação de arquivos médicos
-import pydicom
-
-# Manipulação de dados e arrays
-import numpy as np
-import pandas as pd
-
-# Processamento de imagens
-from skimage import img_as_ubyte, img_as_float
-from skimage.feature import canny
-from skimage.transform import hough_circle, hough_circle_peaks
-from skimage.draw import disk
+# Importando bibliotecas
+import os                                                        # Operações do sistema operacional       
+import pydicom                                                   # Leitura e manipulação de arquivos médicos
+import numpy as np                                               # Manipulação de dados e arrays
+import pandas as pd                                              # Manipulação e análise de dados
+from skimage import img_as_float                                 # Processamento de imagens
+from skimage.feature import canny                                # Detecção de bordas
+from skimage.transform import hough_circle, hough_circle_peaks   # Transformada de Hough para detecção de círculos
+from skimage.draw import disk                                    # Desenho de discos/círculos    
 
 
 # Função para obter os arquivos DICOM em um array
 def funcObterArquivoDicom(dicom_dir):
   dicom_files = []
-  for root, dirs, files in os.walk(dicom_dir):
+  for root, dir, files in os.walk(dicom_dir):
       for file in files:
           if file.endswith(".dcm"):
               dicom_files.append(os.path.join(root, file))
-
-  print("Arquivos DICOM encontrados:", len(dicom_files))
 
   return dicom_files
 
 
 # Função para ordenar os slices do arquivo DICOM
 def funcOrdenarFatias(dicom_files):
+  
   # Ordenar por InstanceNumber (ordem axial)
   slices = [pydicom.dcmread(f) for f in dicom_files]
   slices = [s for s in slices if hasattr(s, 'InstanceNumber')]
@@ -40,7 +33,7 @@ def funcOrdenarFatias(dicom_files):
 
   return slices, volume
 
-
+# Função para filtrar fatias com base na contagem de pixels não nulos
 def funcFatiaversusContagem(volume, limiar):
   fatia_contagem = np.count_nonzero(volume, axis=(1,2))
   indices_validos = np.where(fatia_contagem >= limiar)[0]
@@ -220,6 +213,7 @@ def funcAnalisaUniformidade(i, imagem_completa, tamanho_bloco):
     for i in range(len(imagem_completa)):
       imagem = imagem_completa[i]
       h, w = imagem.shape
+      roi = 1
 
       for y in range(0, h, tamanho_bloco):
           for x in range(0, w, tamanho_bloco):
@@ -239,15 +233,56 @@ def funcAnalisaUniformidade(i, imagem_completa, tamanho_bloco):
               if pixels_validos.size == 0:
                   continue
 
+              media = np.mean(pixels_validos)
+              minimo = np.min(pixels_validos)
+              maximo = np.max(pixels_validos)
+              desvio_padrao = np.std(pixels_validos)
+
+              nu_1 = ((maximo - media) / media) * 100
+              nu_2 = ((media - minimo) / media) * 100
+              nu = max(nu_1, nu_2)
+
               resultados.append({
                   "slice": i,
+                  "roi": roi,
                   "x": x,
                   "y": y,
-                  "mean": np.mean(pixels_validos),
-                  "min": np.min(pixels_validos),
-                  "max": np.max(pixels_validos),
-                  "std": np.std(pixels_validos)
+                  "mean": media,
+                  "min": minimo,
+                  "max": maximo,
+                  "std": desvio_padrao,
+                  "NU1": nu_1,
+                  "NU2": nu_2
               })
+
+              roi = roi + 1
 
     df = pd.DataFrame(resultados)
     return df
+
+def funcParametros(df):
+  
+  df_uniformidade = []                                      # Lista para armazenar os resultados de cada slice
+  ultimo_slice = df['slice'].iloc[-1]                       # Obtém o número do último slice
+
+  for i in range(ultimo_slice + 1):
+    slices = df[ df['slice'] == i ]                         # Filtra o DataFrame para a fatia atual
+    nu = max(max(slices['NU1']), max(slices['NU2']))        # Calcula o Nonuniformity (NU) máximo entre NU1 e NU2
+    n_rois = len(slices)                                    # Número de ROIs na fatia atual
+    soma = sum(slices['max'])                               # Soma dos valores máximos das ROIs na fatia atual
+    media_global = soma / n_rois                            # Média global dos valores máximos
+    somatorio = sum((slices['max'] - media_global)**2)      # Somatório para o cálculo do desvio padrão
+    sd_slice = np.sqrt( (1 / (n_rois - 1)) * somatorio)     # Desvio padrão (SD) da fatia atual
+    cv_slice = (sd_slice / media_global) * 100              # Coeficiente de variação da uniformidade (CV) da fatia atual
+
+    # Armazena os resultados em uma lista de dicionários
+    df_uniformidade.append({
+      "Slice": i,
+      "Nonuniformities (%NU)": nu,
+      "Standard deviation (SD)": sd_slice,
+      "Coefficient of uniformity variation (%CV)": cv_slice
+    })
+
+  df = pd.DataFrame(df_uniformidade)                        # Cria o DataFrame final
+  
+  return df
