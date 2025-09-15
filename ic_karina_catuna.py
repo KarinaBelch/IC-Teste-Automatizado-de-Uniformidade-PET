@@ -34,7 +34,7 @@ uploaded_zip = st.file_uploader(label='Upload your DICOM file:', type="zip")
 
 # Quando o arquivo estiver sido carregado
 if uploaded_zip:
-     temp_dir = "temp_upload"
+     temp_dir = "temp_upload"      # Diretório temporário para armazenar os arquivos extraídos
  
      # Limpar e criar diretório temporário
      if os.path.exists(temp_dir):
@@ -71,7 +71,7 @@ if uploaded_zip:
         # Mostrar o volume 3D do arquivo DICOM
         st.write("Volume 3D:", volume.shape)  # (profundidade, altura, largura)
 
-        min_valor = min(np.count_nonzero(volume, axis=(1,2)))                                           # Cálculo do valor mínimo de contagem
+        min_valor = 0                                                                                   # Cálculo do valor mínimo de contagem
         max_valor = max(np.count_nonzero(volume, axis=(1,2)))                                           # Cálculo do valor máximo de contagem
         limiar = st.slider("Defina o limiar da imagem:", min_value = min_valor, max_value= max_valor)   # Slider para definir o limiar
 
@@ -103,15 +103,13 @@ if uploaded_zip:
             col1, col2 = st.columns([1,1])                                                          # Divir o app em duas colunas (layout)
 
             ############### Processamento das imagens ###############            
-            fatia_contagem, volume_filtrado = funcao.funcFatiaversusContagem(volume, limiar)        # Obtendo ROI e aplicando a máscara no volume
             dados_volume = funcao.funcPreencherVolume(volume_filtrado)                              # Obtendo dados do volume filtrado
             dados_volume = funcao.funcPopularArrays(volume_filtrado, dados_volume)                  # Popular arrays com os dados do volume filtrado
             imagem_mascara = funcao.funcCriarMascara(volume_filtrado, dados_volume['preenchido'])   # Criar a máscara circular para cada fatia
-
             # Recortando as imagens com base na máscara circular
             for i in range(len(volume_filtrado)):
                 imagem_cortada = funcao.funcRecortaPorCirculo(imagem_mascara[i], dados_volume['cx'][i], dados_volume['cy'][i], dados_volume['raio'][i])
-                imagem_cortada_volume.append(imagem_cortada)
+                imagem_cortada_volume.append(imagem_cortada)   
 
             with col1:
 
@@ -171,7 +169,7 @@ if uploaded_zip:
             for i in range (len(imagem_cortada_volume)):
                 fig, axs = plt.subplots(1, 9, figsize=(20, 6))
                 axs[0].imshow(imagem_cortada_volume[i], cmap='gray')
-                axs[0].set_title(f'Slice {i})')
+                axs[0].set_title(f'Slice {i}')
                 axs[0].axis('off')
 
                 for j in range(7):

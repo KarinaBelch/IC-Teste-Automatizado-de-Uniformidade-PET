@@ -33,40 +33,17 @@ def funcOrdenarFatias(dicom_files):
 
   return slices, volume
 
+
 # Função para filtrar fatias com base na contagem de pixels não nulos
 def funcFatiaversusContagem(volume, limiar):
-  fatia_contagem = np.count_nonzero(volume, axis=(1,2))
-  indices_validos = np.where(fatia_contagem >= limiar)[0]
-  volume_filtrado = volume[indices_validos]
+  fatia_contagem = np.count_nonzero(volume, axis=(1,2))         # Conta pixels não nulos em cada fatia
+  indices_validos = np.where(fatia_contagem >= limiar)[0]       # Índices das fatias que atendem ao limiar
+  volume_filtrado = volume[indices_validos]                     # Filtra o volume com base nos índices válidos
 
   return fatia_contagem, volume_filtrado
 
-# Função para Criar a Máscara Reduzida
-def funcMascaraCircularReduzida(image_rgb, scale):
-
-    edges = canny(image_rgb, sigma=5, low_threshold=0.1, high_threshold=0.2)
-
-    hough_radii = np.arange(0, image_rgb.shape[0], 1)
-    hough_res = hough_circle(edges, hough_radii)
-
-    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=1)
-
-    if len(cx) == 0:
-        empty_mask = np.zeros_like(image_rgb, dtype=bool)
-        empty_edges = np.zeros_like(image_rgb, dtype=bool)
-        return empty_edges, empty_mask, 0, 0, 0
-
-    # Cria círculo com raio reduzido
-    r_reduzido = int(radii[0] * scale)
-    rr, cc = disk((cy[0], cx[0]), r_reduzido, shape=image_rgb.shape)
-
-    mask = np.zeros_like(image_rgb, dtype=bool)
-    mask[rr, cc] = True
-
-    return edges, mask, r_reduzido, cx[0], cy[0]
 
 # Prepara array para armazenar volume preenchido
-
 def funcPreencherVolume(volume):
     shape_volume = volume.shape
     num_slices = shape_volume[0]
@@ -96,6 +73,34 @@ def funcPopularArrays(volume_filtrado, dados_volume):
         dados_volume['cy'][i] = cy
 
     return dados_volume
+
+import numpy as np
+np_count_nonzero = np.count_nonzero
+
+# Função para Criar a Máscara Reduzida
+def funcMascaraCircularReduzida(image_rgb, scale):
+
+    edges = canny(image_rgb, sigma=1.5, low_threshold=0.1, high_threshold=0.3)
+
+    hough_radii = np.arange(8, image_rgb.shape[0] // 2, 1)
+    hough_res = hough_circle(edges, hough_radii)
+
+    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=1)
+
+    if len(cx) == 0:
+        empty_mask = np.zeros_like(image_rgb, dtype=bool)
+        empty_edges = np.zeros_like(image_rgb, dtype=bool)
+        return empty_edges, empty_mask, 0, 0, 0
+
+    # Cria círculo com raio reduzido
+    r_reduzido = float(radii[0] * scale)
+    rr, cc = disk((cy[0], cx[0]), r_reduzido, shape=image_rgb.shape)
+
+    mask = np.zeros_like(image_rgb, dtype=bool)
+    mask[rr, cc] = True
+
+    return edges, mask, r_reduzido, cx[0], cy[0]
+
 
 # Criando a máscara
 def funcCriarMascara(volume, filled_volume):
@@ -266,6 +271,8 @@ def funcParametros(df):
   ultimo_slice = df['slice'].iloc[-1]                       # Obtém o número do último slice
 
   for i in range(ultimo_slice + 1):
+    if df[df['slice'] == i].empty:                             # Verifica se o slice atual está vazio
+      continue
     slices = df[ df['slice'] == i ]                         # Filtra o DataFrame para a fatia atual
     nu = max(max(slices['NU1']), max(slices['NU2']))        # Calcula o Nonuniformity (NU) máximo entre NU1 e NU2
     n_rois = len(slices)                                    # Número de ROIs na fatia atual
