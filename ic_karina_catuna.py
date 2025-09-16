@@ -106,6 +106,7 @@ if uploaded_zip:
             dados_volume = funcao.funcPreencherVolume(volume_filtrado)                              # Obtendo dados do volume filtrado
             dados_volume = funcao.funcPopularArrays(volume_filtrado, dados_volume)                  # Popular arrays com os dados do volume filtrado
             imagem_mascara = funcao.funcCriarMascara(volume_filtrado, dados_volume['preenchido'])   # Criar a máscara circular para cada fatia
+
             # Recortando as imagens com base na máscara circular
             for i in range(len(volume_filtrado)):
                 imagem_cortada = funcao.funcRecortaPorCirculo(imagem_mascara[i], dados_volume['cx'][i], dados_volume['cy'][i], dados_volume['raio'][i])
@@ -116,7 +117,6 @@ if uploaded_zip:
                 st.markdown("---")                          # Divisor horizontal (layout)
                 st.subheader(f"Abordagem de Miller")        # Subtítulo (layout)
 
-
                 ####### Abordagem de Miller ###############
 
                 # Para cada fatia, detectar os círculos e criar as imagens com os círculos desenhados
@@ -125,17 +125,20 @@ if uploaded_zip:
                     imagens_com_circulos = [c * imagem_cortada_volume[i] for c in circulos]     # Multiplica cada círculo pela imagem cortada
 
                     # Cria a máscara unida
-                    mascara_unida = np.clip(np.sum(circulos, axis=0), 0, 1)                 
-                    imagem_unida = mascara_unida * imagem_cortada_volume[i] 
+                    circulo_central = funcao.func_CirculoCentral(imagem_cortada_volume[i])
+                    imagem_unida = circulo_central * imagem_cortada_volume[i]
 
                     imagens_com_circulos.append(imagem_unida)  # adiciona como oitava imagem
                     circulos_volume.append(imagens_com_circulos)
                 
                 df = funcao.funcGerarDataframeMetodoUm(circulos_volume)            # Gerar DataFrame com os resultados do método de Miller
+                df_miller = funcao.funcParametrosMiller(df)                        # Gerar estatísticas do DataFrame do método de Miller
 
                 if not df.empty:
                     st.caption(f"Valores obtidos para cada ROI")
                     st.dataframe(df)
+                    st.caption(f"Valores obtidos a partir do Metodo de Miller")
+                    st.dataframe(df_miller)
 
 
             with col2:
@@ -157,7 +160,7 @@ if uploaded_zip:
                     st.dataframe(df_uniformidade_hasford)                    # Mostrar os valores estatísticos para cada slice (layout)
 
 
-     #### Visualização detalhada dos resultados ###############
+     ############ Visualização detalhada dos resultados ###############
      if st.session_state.mostrar_slider:
 
         st.markdown("---")                      # Divisor horizontal (layout)
@@ -178,7 +181,7 @@ if uploaded_zip:
                     axs[j+1].axis('off')
 
                 axs[8].imshow(circulos_volume[i][7], cmap='gray')
-                axs[8].set_title("Todos unidos")
+                axs[8].set_title("Círculo de 16cm")
                 axs[8].axis('off')
                 st.pyplot(fig)
 

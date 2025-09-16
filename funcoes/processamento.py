@@ -8,6 +8,7 @@ from skimage.feature import canny                                # Detecção de
 from skimage.transform import hough_circle, hough_circle_peaks   # Transformada de Hough para detecção de círculos
 from skimage.draw import disk                                    # Desenho de discos/círculos    
 
+######### Funções de Processamento da Imagem #########
 
 # Função para obter os arquivos DICOM em um array
 def funcObterArquivoDicom(dicom_dir):
@@ -129,7 +130,9 @@ def funcRecortaPorCirculo(image, cx, cy, raio):
 
     return recorte
 
+############ Abordagem de Miller ############
 
+# Função para criar os círculos menores
 def funcCirculos(imagemCortada):
     diametro = imagemCortada.shape[0]
     nx = ny = diametro
@@ -166,10 +169,34 @@ def funcCirculos(imagemCortada):
     return lista_circulos
 
 
+# Função para criar o círculo central
+def func_CirculoCentral(imagemCortada):
+
+    diametro = imagemCortada.shape[0]
+    nx = ny = diametro
+
+    # Centros e distâncias
+    cx = (nx // 2) + 1
+    cy = (ny // 2) + 1
+    dx = 16 / 0.4
+    dy = 16 / 0.4
+
+    # Raios
+    rx = dx / 2
+    ry = dy / 2
+
+    x, y = np.meshgrid(np.arange(1, nx+1), np.arange(1, ny+1))
+
+    Im = np.zeros((nx, ny))
+    Im[((x - cx) ** 2 + (y - cy) ** 2) < rx ** 2] = 1
+
+    return Im
+
+# Função para gerar o dataframe com os resultados do método 1
 def funcGerarDataframeMetodoUm(circulos_volume):
    dados = []
    for i, fatia in enumerate(circulos_volume):  # i = índice da slice
-    for j in range(len(fatia)-1):  # j = índice do círculo
+    for j in range(len(fatia)):  # j = índice do círculo
         imagem_mascarada = fatia[j]
 
         # Pega apenas os valores dentro do círculo (ou seja, > 0)
@@ -184,7 +211,7 @@ def funcGerarDataframeMetodoUm(circulos_volume):
             mean = min_val = max_val = std = np.nan
 
         dados.append({
-            "Name": f"S{i}C{j}",
+            "Name": f"S{i}C{j+1}",
             "Slice": i,
             "Circle": j + 1,
             "Mean": mean,
@@ -197,7 +224,61 @@ def funcGerarDataframeMetodoUm(circulos_volume):
 
    return df
 
+# Função para calcular os parâmetros do método de Miller
+def funcParametrosMiller(df):
 
+  circulo_central = df[df['Circle'] == 8]                              # Filtrando apenas os circulos centrais (16 cm)
+  print(len(circulo_central))
+  circulo_central = circulo_central.iloc[3:(len(circulo_central)-3)]   # Removendo os slices dos 12mm primeiros e ultimos milimetros
+  print(len(circulo_central))
+  x_s = circulo_central['Mean']                                        # Obtendo a média dos circulos centrais
+
+  # Cálculo do SUV, Iva
+  Iva = x_s.mean()                                       # Cálculo do SUV
+
+  # Cálculo da variação axial na intensidade da imagem
+  max_xs = x_s.max()                                     # Valor máximo entre os circulos
+  min_xs = x_s.min()                                     # Valor mínimo entre os circulos
+  Va = ((max_xs - min_xs) / Iva )* 100                   # Variação Axial na intensidade da imagem
+
+
+  # Cálculo para obter somente os 40% centrais
+  tamanho = len(circulo_central)
+  centro = tamanho*0.4
+  inicio = int((tamanho - centro) // 2)
+  fim = int(inicio + tamanho)
+  circulo_central = circulo_central.iloc[inicio:fim]
+  print(len(circulo_central))
+
+  # Cálculo da Uniformidade Transversa Integral
+  y_s = []
+
+  for i in range(1,8):
+
+    circulo_central = df[df['Circle'] == i]                  # Filtrando cada ROI
+    media = circulo_central['Mean']                          # Obtendo a média do ROI
+    media_roi = media.mean()                                 # Cálculo da média por ROI
+    y_s.append(media_roi)
+
+  max_ys = max(y_s)
+  min_ys = min(y_s)
+  IUt = ((max_ys - min_ys) / (max_ys + min_ys)) * 100        # Cálculo da Uniformidade Transversa Integral
+
+  dados = []
+  dados.append({
+      "Volume Averaged (SUV)": Iva,
+      "Axial Variation in Image Intensity (%Va)": Va,
+      "Transverse integral uniformity (%IUt)": IUt
+  })
+
+  dados_df = pd.DataFrame(dados)
+
+  return dados_df
+
+
+################# Abordagem de Hasford #################
+
+# Função para calcular o tamanho dos quadrados
 def funcQuadrados(fatia, roi_mm):
   y_px_mm, x_px_mm = fatia.PixelSpacing
 
@@ -211,7 +292,7 @@ def funcQuadrados(fatia, roi_mm):
   
   return quadrante[0]
 
-
+# Função para analisar a uniformidade
 def funcAnalisaUniformidade(i, imagem_completa, tamanho_bloco):
     resultados = []
 
@@ -265,6 +346,8 @@ def funcAnalisaUniformidade(i, imagem_completa, tamanho_bloco):
     df = pd.DataFrame(resultados)
     return df
 
+
+# Função para calcular os parâmetros do método 2
 def funcParametros(df):
   
   df_uniformidade = []                                      # Lista para armazenar os resultados de cada slice
