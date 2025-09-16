@@ -76,7 +76,7 @@ if uploaded_zip:
         limiar = st.slider("Defina o limiar da imagem:", min_value = min_valor, max_value= max_valor)   # Slider para definir o limiar
 
         # Botão para gerar o relatório
-        if st.button("Gerar relatório excel"):
+        if st.button("Gerar relatório"):
             button = True
             st.session_state.mostrar_slider = True
         else:
@@ -172,28 +172,30 @@ if uploaded_zip:
             for i in range (len(imagem_cortada_volume)):
                 fig, axs = plt.subplots(1, 9, figsize=(20, 6))
                 axs[0].imshow(imagem_cortada_volume[i], cmap='gray')
-                axs[0].set_title(f'Slice {i}')
+                axs[0].set_title(f'Slice {i}', weight='bold', color='black', loc='left', alpha=0.8)
                 axs[0].axis('off')
 
                 for j in range(7):
                     axs[j+1].imshow(circulos_volume[i][j], cmap='gray')
-                    axs[j+1].set_title(f'Círculo {j+1}')
+                    axs[j+1].set_title(f'Círculo {j+1}', weight='bold', color='black', loc='left', alpha=0.8)
                     axs[j+1].axis('off')
+                    axs[j+1].text(0.5, -0.1, f'Min: {df["Min"][j + i*8]:.2f}\nMax: {df["Max"][j + i*8]:.2f}\nMean: {df["Mean"][j + i*8]:.2f}\nStd: {df["Std"][j + i*8]:.2f}', fontsize=12, color='black', ha='center', va='top', transform=axs[j+1].transAxes, backgroundcolor='lightgray')
 
                 axs[8].imshow(circulos_volume[i][7], cmap='gray')
-                axs[8].set_title("Círculo de 16cm")
+                axs[8].set_title("Círculo de 16cm", weight='bold', color='black', loc='left', alpha=0.8)
                 axs[8].axis('off')
+                axs[8].text(0.5, -0.1, f'Min: {df["Min"][7 + i*8]:.2f}\nMax: {df["Max"][7 + i*8]:.2f}\nMean: {df["Mean"][7 + i*8]:.2f}\nStd: {df["Std"][7 + i*8]:.2f}', fontsize=12, color='black', ha='center', va='top', transform=axs[8].transAxes, backgroundcolor='lightgray')     
                 st.pyplot(fig)
 
 
         ######## Abordagem de Hasford ##########
         with st.expander("Abordagem de Hasford"):
             s = 0
-            for i in range (len(imagem_cortada_volume)//4):
+            for i in range (len(imagem_cortada_volume)//5):
 
-                fig, ax = plt.subplots(1, 4, figsize=(6, 6))
+                fig, ax = plt.subplots(1, 5, figsize=(6, 6))
 
-                for j in range(4):
+                for j in range(5):
                     ax[j].imshow(imagem_cortada_volume[s], cmap='gray')
 
                     metodo_hasford_slice = metodo_hasford[metodo_hasford["slice"] == s]
@@ -210,7 +212,8 @@ if uploaded_zip:
                         )
                         ax[j].add_patch(rect) 
                     
-                    ax[j].set_title(f'Slice {s}')
+                    ax[j].set_title(f'Slice {s}', fontsize=8, pad=8, weight='bold', color='black', loc='left', alpha=0.8)
+                    ax[j].text(0.5, -0.1,f'Nonuniformities (%NU): \n{df_uniformidade_hasford["Nonuniformities (%NU)"].values[s]:.2f}%\nStandard deviation (SD): \n{df_uniformidade_hasford["Standard deviation (SD)"].values[s]:.2f}\nCoefficient of uniformity \nvariation (%CV): \n{df_uniformidade_hasford["Coefficient of uniformity variation (%CV)"].values[s]:.2f}', fontsize=4, color='black', ha='center', va='top', transform=ax[j].transAxes, backgroundcolor='lightgray')
                     ax[j].axis('off')
                     s = s+1
 
