@@ -8,6 +8,20 @@ import matplotlib.patches as patches      # Desenho de formas geométricas
 import streamlit as st                    # Criação de apps web interativos
 import shutil                             # Operações de arquivo de alto nível
 
+#### Setup da Página ####
+# Titulo da página (layout)
+st.set_page_config(page_title='Projeto de Iniciação Científica', page_icon='🥼', layout='wide')
+st.title('Automated Uniformity Testing PET Instrumentation')
+st.info('Projeto de Iniciação Cientifica referente ao curso de Engenharia Biomédica da Universidade Federal do ABC.')
+
+# Menu Lateral (layout)
+st.sidebar.header("Menu")
+st.sidebar.caption("Leitura de arquivos DICOM.")
+
+
+
+#### Variáveis Globais ####
+
 # Declarando arrays
 dicom_files = []
 imagem_cortada_volume = []
@@ -20,14 +34,6 @@ df_uniformidade_hasford = []
 if "mostrar_slider" not in st.session_state:
     st.session_state.mostrar_slider = False
 
-# Titulo da página (layout)
-st.set_page_config(page_title='Projeto de Iniciação Científica', page_icon='🥼', layout='wide')
-st.title('Automated Uniformity Testing PET Instrumentation')
-st.info('Projeto de Iniciação Cientifica referente ao curso de Engenharia Biomédica da Universidade Federal do ABC.')
-
-# Menu Lateral (layout)
-st.sidebar.header("Menu")
-st.sidebar.caption("Leitura de arquivos DICOM.")
 
 # Upload do arquivo pelo usuário
 uploaded_zip = st.file_uploader(label='Upload your DICOM file:', type="zip")
