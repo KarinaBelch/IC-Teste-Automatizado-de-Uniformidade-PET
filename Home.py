@@ -36,7 +36,7 @@ if "mostrar_slider" not in st.session_state:
 
 
 # Upload do arquivo pelo usuário
-uploaded_zip = st.file_uploader(label='Upload your DICOM file:', type="zip")
+uploaded_zip = st.file_uploader(label='Upload your DICOM file in .zip:', type="zip")
 
 # Quando o arquivo estiver sido carregado
 if uploaded_zip:
