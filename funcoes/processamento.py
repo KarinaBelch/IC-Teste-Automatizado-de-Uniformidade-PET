@@ -37,9 +37,10 @@ def funcOrdenarFatias(dicom_files):
 
 # Função para filtrar fatias com base na contagem de pixels não nulos
 def funcFatiaversusContagem(volume, limiar):
+  min_limiar = limiar[0]
+  max_limiar = limiar[1]
   fatia_contagem = np.count_nonzero(volume, axis=(1,2))         # Conta pixels não nulos em cada fatia
-  indices_validos = np.where(fatia_contagem >= limiar)[0]       # Índices das fatias que atendem ao limiar
-  volume_filtrado = volume[indices_validos]                     # Filtra o volume com base nos índices válidos
+  volume_filtrado = volume[min_limiar : max_limiar+1]              # Filtra o volume com base nos índices válidos
 
   return fatia_contagem, volume_filtrado
 

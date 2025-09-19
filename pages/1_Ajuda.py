@@ -73,7 +73,3 @@ with tab2:
     st.title("FAQ")
     st.markdown("""Here you can find answers to the most common questions about using the application.
 """)
-
-
-
-
