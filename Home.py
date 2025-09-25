@@ -52,6 +52,7 @@ if uploaded_zip:
 
      dicom_files = funcao.funcObterArquivoDicom(temp_dir)       # Listar arquivos .dcm
      slices, volume = funcao.funcOrdenarFatias(dicom_files)     # Ordenar as fatias e criar o volume 3D
+
     
      col1, col2 = st.columns([2,3])                             # Divir a seção no layout da página em duas colunas (layout)
 
@@ -140,7 +141,8 @@ if uploaded_zip:
                     circulos_volume.append(imagens_com_circulos)
                 
                 df = funcao.funcGerarDataframeMetodoUm(circulos_volume)            # Gerar DataFrame com os resultados do método de Miller
-                df_miller = funcao.funcParametrosMiller(df)                        # Gerar estatísticas do DataFrame do método de Miller
+                fatias = 12 / slices[0].SliceThickness                             # Número de fatias que ocupam 12mm 
+                df_miller = funcao.funcParametrosMiller(df, int(fatias))                # Gerar estatísticas do DataFrame do método de Miller
 
                 if not df.empty:
                     st.caption(f"Valores obtidos para cada ROI")

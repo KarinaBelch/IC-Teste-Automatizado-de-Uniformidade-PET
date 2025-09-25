@@ -66,7 +66,7 @@ def funcPopularArrays(volume_filtrado, dados_volume):
         image = volume_filtrado[i]
         image_rgb = img_as_float(image)
 
-        edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.88)
+        edges, filled, raio, cx, cy = funcMascaraCircularReduzida(image_rgb, scale=0.92)
 
         dados_volume['edges'][i] = edges
         dados_volume['preenchido'][i] = filled
@@ -226,13 +226,11 @@ def funcGerarDataframeMetodoUm(circulos_volume):
    return df
 
 # Função para calcular os parâmetros do método de Miller
-def funcParametrosMiller(df):
+def funcParametrosMiller(df, fatias):                       
 
-  circulo_central = df[df['Circle'] == 8]                              # Filtrando apenas os circulos centrais (16 cm)
-  print(len(circulo_central))
-  circulo_central = circulo_central.iloc[3:(len(circulo_central)-3)]   # Removendo os slices dos 12mm primeiros e ultimos milimetros
-  print(len(circulo_central))
-  x_s = circulo_central['Mean']                                        # Obtendo a média dos circulos centrais
+  circulo_central = df[df['Circle'] == 8]                                                               # Filtrando apenas os circulos centrais (16 cm)
+  circulo_central_reduzido = circulo_central.iloc[fatias+1 : (len(circulo_central)-fatias)]             # Removendo os slices dos 12mm primeiros e ultimos milimetros
+  x_s = circulo_central_reduzido['Mean']                                                                # Obtendo a média dos circulos centrais
 
   # Cálculo do SUV, Iva
   Iva = x_s.mean()                                       # Cálculo do SUV
@@ -244,21 +242,20 @@ def funcParametrosMiller(df):
 
 
   # Cálculo para obter somente os 40% centrais
-  tamanho = len(circulo_central)
+  tamanho = len(circulo_central_reduzido)
   centro = tamanho*0.4
   inicio = int((tamanho - centro) // 2)
   fim = int(inicio + tamanho)
-  circulo_central = circulo_central.iloc[inicio:fim]
-  print(len(circulo_central))
+  circulo_central_reduzido_2 = circulo_central_reduzido.iloc[inicio:fim]
 
   # Cálculo da Uniformidade Transversa Integral
   y_s = []
 
   for i in range(1,8):
 
-    circulo_central = df[df['Circle'] == i]                  # Filtrando cada ROI
-    media = circulo_central['Mean']                          # Obtendo a média do ROI
-    media_roi = media.mean()                                 # Cálculo da média por ROI
+    circulo_central_reduzido_2 = df[df['Circle'] == i]                             # Filtrando cada ROI
+    media = circulo_central_reduzido_2['Mean']                          # Obtendo a média do ROI
+    media_roi = media.mean()                                            # Cálculo da média por ROI
     y_s.append(media_roi)
 
   max_ys = max(y_s)
