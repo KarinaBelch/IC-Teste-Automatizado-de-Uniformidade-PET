@@ -229,7 +229,7 @@ def funcGerarDataframeMetodoUm(circulos_volume):
 def funcParametrosMiller(df, fatias):                       
 
   circulo_central = df[df['Circle'] == 8]                                                               # Filtrando apenas os circulos centrais (16 cm)
-  circulo_central_reduzido = circulo_central.iloc[fatias+1 : (len(circulo_central)-fatias)]             # Removendo os slices dos 12mm primeiros e ultimos milimetros
+  circulo_central_reduzido = circulo_central.iloc[fatias : (len(circulo_central)-fatias-1)]             # Removendo os slices dos 12mm primeiros e ultimos milimetros
   x_s = circulo_central_reduzido['Mean']                                                                # Obtendo a média dos circulos centrais
 
   # Cálculo do SUV, Iva
